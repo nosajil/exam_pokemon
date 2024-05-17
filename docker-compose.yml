@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MARIADB_ROOT_PASSWORD: example
+      MYSQL_DATABASE: pokemon
+    ports:
+      - "3307:3306"
+    volumes:
+      - /var/lib/mysql
+
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3002:3001"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_USER=root
+      - PMA_PASSWORD=example
+    ports:
+      - "8080:80"
+
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3000"
+    depends_on:
+      - mariadb
+    environment:
+      DB_NAME: 'pokemon'
+      DB_USER: 'root'
+      DB_PASSWORD: 'example'
+      DB_HOST: 'mariadb'
+      DB_PORT: '3306'
